@@ -1,0 +1,6 @@
+SNRs = -22.7748 dB
+reverberation time = 3 second (RT60)
+[2018-11-15] reverberation time = 0.218625 second (RT60) [NOT above"]
+SPL on normal = 46.6 dbA
+SPL on quiet = 46.6 dbA
+

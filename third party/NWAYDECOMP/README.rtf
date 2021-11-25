@@ -1,0 +1,151 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fnil\fcharset0 Calibri;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat0\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+{\info
+{\author Roemer van der Meij}}\margl1440\margr1440\vieww14040\viewh14800\viewkind1\viewscale120
+\deftab720
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0\i\fs22 \cf0 NWAYDECOMP
+\i0  is a MATLAB toolbox intended for N-way/multi-way decompositions of neuroscience data. It contains several models that decompose numerical arrays, which are complex-valued or real-valued, into components. What kind of neuroscience data each decomposition requires, how a component is modeled, what a components represents, as well as the required structure of the numerical array, depends on the model. The toolbox depends on functions from other toolboxes/releases (most notably FieldTrip), which are described at the end of this document. \
+\
+The toolbox contains the following functions:\
+\pard\pardeftab720\li720\fi-360\ri0\partightenfactor0
+\ls1\ilvl0\cf0 -	
+\i nd_nwaydecomposition\
+\ls1\ilvl0
+\i0 -	
+\i nwaydecomp_spacefsp\
+\ls1\ilvl0
+\i0 -	
+\i nwaydecomp_spacetime\
+\ls1\ilvl0
+\i0 -	
+\i nwaydecomp_parafac\
+\ls1\ilvl0
+\i0 -	
+\i nwaydecomp_parafac2\
+\ls1\ilvl0
+\i0 -	
+\i nwaydecomp_parafac2cp\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\i0 \cf0 \
+The first function, 
+\i nd_nwaydecomposition
+\i0  is the main interface function, and is an intelligent wrapper that repeatedly calls the individual model functions. It takes care of randomly initializing the models to avoid local minima of their loss functions, and to avoid degenerate solutions. It additionally contains algorithms for estimating the number of components to extract from the numerical array, which needs to be determined empirically (similar to ICA/PARAFAC).\
+	Nd_nwaydecomposition requires \'91FieldTrip style\'92 input. That is, a configuration structure (MATLAB structure array) which contains input options in its fields, and a FieldTrip style data structure (MATLAB structure array). The numerical array to be decomposed should be present in a field of this data structure, as well as at least a \'91label\'92 and \'91dimord\'92 field.\
+	 The output of this function is a MATLAB structure, which contains a \'91comp\'92 field. This field is a MATLAB cell-array which contains an extracted component in each cell, which then contains the component-specific parameters in separate lower-level cells. Additional output fields are described in the documentation of each individual function (at the top).\
+	For those users novice to FieldTrip, the \'91label\'92 field is a MATLAB cell-array of strings, where each cell contains the name for each site/channel in the data. The \'91dimord\'92 field is a string, which contains an abbreviation of the names of each of the dimensions of the numerical array. See below for an example.\
+\
+The other functions are \'91low-level\'92 model functions that extract components according to their models. These take as input the numerical array to be decomposed, a set of required options, and additional options as key-value pairs. The functions are repeatedly called by the high-level main function, but can also be called individually. \
+	The output of these functions is different from the high-level function, and is separated into multiple output arguments. The most important one, by default \'91comp\'92, contains the extracted components. It is different from the \'91comp\'92 field described above. It is a MATLAB cell-array, but now it contains in each cell the individual parameter matrices of the model that was used. With a few exceptions, these matrices contain in their columns the individual component loading-vectors. Output-specifics are described in each of the functions\'92 documentation (at the top).\
+\pard\pardeftab720\fi720\ri0\partightenfactor0
+\cf0 The models and their usage are briefly discussed below, with the appropriate references. Please cite these when you use them.\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \
+
+\i SPACE-FSP/SPACE-time\
+
+\i0 These two models decompose Fourier coefficients obtained from electrophysiological recordings at multiple sites, multiple frequencies, multiple epochs/trials, and using multiple tapers. Importantly, the models extract components according to a plausible model of a neurobiological rhythm: a spatially distributed oscillation with energy in a range of frequencies and between-site phase relations for each frequency. The first model, SPACE-FSP extracts between-site phase relations for each frequency. The second model, SPACE-time, fits between-site time delays to these phase relations over frequencies. The models, their components, and the rationale behind them, are described in detail in the publications below (please cite this when used): \
+\pard\pardeftab720\fi720\ri0\partightenfactor0
+\cf0 van der Meij R, Jacobs J, Maris E (2015). Uncovering phase-coupled oscillatory networks in\
+	 electrophysiological data. 
+\i Human Brain Mapping\
+\pard\pardeftab720\fi720\ri0\sl276\slmult1\partightenfactor0
+
+\i0 \cf0 van der Meij R, Van Ede F, Maris E (2016). Rhythmic Components in Extracranial Brain \
+\pard\pardeftab720\li720\fi720\ri0\sl276\slmult1\partightenfactor0
+\cf0 Signals Reveal Multifaceted Task Modulation of Overlapping Neuronal Activity.
+\i  PLOS One\
+\pard\pardeftab720\fi720\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\i0 \cf0 The two models require specific input. The numerical array needs to be complex-valued and contain Fourier coefficients over sites, frequencies, trials/epochs, and tapers, in dimensions
+\i  in that order
+\i0 , in a 
+\i 4-way numerical array
+\i0 . As such, the \'91dimord\'92 field in the data-structure needs to be \'91chan_freq_epoch_tap\'92. Importantly, the term tapers here is loosely defined. It can refer to e.g. Welch windows in a single trial, multiple Slepian tapers, or a combination of both. For example, if you use \'91mtmconvol\'92 as a spectral analysis method in FieldTrip to obtain temporally resolved Fourier coefficients, and use of these time-point to compute a controlled estimate of the between-site cross-products, then each of the time-points is a Welch-window (which describes the spectral content of a time-window surrounding it). The dimension containing tapers can also contain NaNs that depend on trial/epoch and frequency; i.e. the models can deal with a variable number of tapers. Input-specifics are described in the documentation of the functions.\
+\
+
+\i PARAFAC/PARAFAC2/PARAFAC2CP\
+
+\i0 These functions extract components according to the PARAFAC/2 models, and can be used on any N-way array (complex- and real-valued; N>2). These models are modified in one way: they allow for parameter matrices to be real-valued when the numerical array is complex-valued. The PARAFAC model was used to extracted components from a complex-valued 4-way array which described phase-amplitude coupling between oscillations at amplitude-providing and phase-providing sites (first 2 dimensions), and at amplitude-providing and phase-providing frequencies (last 2 dimensions). Only the first two parameter matrices, corresponding to the first two dimensions, were complex-valued, and described all phase information in the array. This was published in the publication below (please cite this when you use this model):\
+\pard\pardeftab720\fi720\ri0\partightenfactor0
+\cf0 van der Meij R, Kahana M, Maris E (2012). Phase-Amplitude Coupling in Human \
+	Electrocorticography Is Spatially Distributed and Phase Diverse. 
+\i Journal of Neuroscience \
+	32: 111-123.\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\i0 \cf0 The PARAFAC2 models have been modified in the same way, and allow for some matrices to be real-valued (not all of them, see function documentation). When using them, please cite the publication above. The PARAFAC2CP model is nearly identical to the PARAFAC2 model, except that it allows for a more computational efficient usage (with the consequence that the final \'91P\'92 needs to be computed by the user). The models will be merged in the future. The models are expanded in one of two possible ways when they are used on N-way arrays where N>3 (the original model was specified for N=3). This is specified in the function documentation. \
+	An extremely valuable resource on PARAFAC/2 and other N-way models is written by Rasmus Bro, which can be found at {\field{\*\fldinst{HYPERLINK "%22"}}{\fldrslt \cf2 \ul \ulc2 http://www.models.kvl.dk/users/rasmus/}} (the monograph, highly recommended). This site also contains a very valuable code base, which, amongst others, contains the N-way Toolbox (a very important inspiration for my implementation of the PARAFAC models described above). Other important work which has been of great importance to the development of the above PARAFAC models, but also for both SPACE models, is that of Kiers & Bro on PARAFAC2 and Sidiropoulos, Giannakis & Bro on complex-valued PARAFAC. The appropriate references (and others) are provided below. \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\b \cf0 \
+\
+Dependencies\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\b0 \cf0 This toolbox depends on 
+\i FieldTrip
+\i0 , an open-source toolbox for advanced electrophysiological data-analysis. FieldTrip can be downloaded from:\
+
+\i The FieldTrip wiki
+\i0 : {\field{\*\fldinst{HYPERLINK "http://fieldtriptoolbox.org"}}{\fldrslt \cf2 \ul \ulc2 http://fieldtriptoolbox.org}}\
+
+\i The FieldTrip github repository
+\i0 : {\field{\*\fldinst{HYPERLINK "%22"}}{\fldrslt \cf2 \ul \ulc2 https://github.com/fieldtrip/fieldtrip}}\
+\
+
+\i Nwaydecomp
+\i0  also depends on the following contribution from the MATLAB file exchange:\
+Khatri-Rao product (fast): {\field{\*\fldinst{HYPERLINK "%22"}}{\fldrslt \cf2 \ul \ulc2 http://www.mathworks.com/matlabcentral/fileexchange/28872}}\
+
+\i 	(used in all models)\
+	
+\i0 This files is included in the repository as external.
+\i \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+\cf0 IMPORTANT, if the N-way toolbox from Rasmus Bro (fantastic work) is also installed, then there might be a function naming conflict, as it also contains a function called kr.m. The function described above is a faster implementation, can perform successive khatri-rao products, and is required for the toolbox described here, nwaydecomp. 
+\i0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\b \cf0 Reference literature on PARAFAC/2\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\b0 \cf0 Bro R (1998) Multi-way Analysis in the Food Industry. Models, Algorithms, and Applications. In: \
+	Universiteit van Amsterdam.\
+Carrol JD, Chang J (1970) Analysis of individual differences in multidimensional scaling via an N-way\
+\pard\pardeftab720\fi720\ri0\partightenfactor0
+\cf0  generalization of "Eckart-Young" decomposition. Psychometrika 35.\
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 Harshman RA (1970) Foundations of the PARAFAC procedure: model and conditions for an 'explanatory' \
+	multi-mode factor analysis. UCLA Working Papers in Phonetics 16:1-84.\
+Kiers HAL, Ten Berge JMF, Bro R (1999) PARAFAC2 - Part I. A direct fitting algorithm for the PARAFAC2 \
+	model. Journal of Chemometrics 13:275-294.\
+Sidiropoulos ND, Giannakis GB, Bro R (2000) Blind PARAFAC receivers for DS-CDMA systems. Ieee T \
+	Signal Proces 48:810-823.\
+\
+\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\b \cf0 Copyright statement\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\i\b0 \cf0 Copyright (C) 2012-2016 (or present), Roemer van der Meij, roemervandermeij AT gmail DOT com\
+\
+This file is part of Nwaydecomp, see https://github.com/roemervandermeij/nwaydecomp\
+Nwaydecomp is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or\
+ (at your option) any later version.\
+\
+Nwaydecomp is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\
+GNU General Public License for more details. You should have received a copy of the GNU General Public License along with Nwaydecomp. If not, see {\field{\*\fldinst{HYPERLINK "http://www.gnu.org/licenses/"}}{\fldrslt \cf2 \ul \ulc2 http://www.gnu.org/licenses/}}.\
+}

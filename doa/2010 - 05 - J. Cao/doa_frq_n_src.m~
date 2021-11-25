@@ -1,0 +1,27 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Name        : Direction of Arrival (DOA) Estimation for L-Shaped Array
+%
+% Description : J. Cao et al.,  DOA Estimation for Wideband Sources Using Cross Correlation 
+%               Transformation, IEEE, 2010.
+%
+% Author      : Bandhit Suksiri
+%               Information Systems Engineering
+%               Kochi University of Technology
+%
+% Contact     : bandhit.tni@gmail.com
+%
+% Logs        : Created: 19 June 2017, Bandhit Suksiri,
+%               Updated: 19 June 2017, Bandhit Suksiri.
+%
+% Copyright 2016 - 2017,
+% Signal Processing & New Generation Network Laboratory (FUKULAB),
+% Kochi University of Technology (KUT).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function norm_mat = doa_n_src ( ...
+    src_mat, n_sen, d_sen, lamb, n_src, cen_frq, ...
+    ang_x_rad_vec, ang_z_rad_vec)
+    ...
+end
+
+% EOF %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

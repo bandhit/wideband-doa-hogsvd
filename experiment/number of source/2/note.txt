@@ -1,0 +1,3 @@
+n_src           = 2;
+real_az_deg_vec = [ 45; 135];
+real_el_deg_vec = [ 50; 100];
